@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Johan Malmstedt</title>
+  <meta name="description" content="Johan Malmstedt is a sound enthusiast exploring the conjunction between signal processing and historiography.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&display=swap" rel="stylesheet">
+  <style>
+    :root { --paper: #fff; --ink: #0b0b0b; --grey: #7a7a75; --hair: #dcdcd7; --pad: clamp(1.1rem, 3.2vw, 3rem); --gap: clamp(1rem, 2.2vw, 2.25rem); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { background: var(--paper); color: var(--ink); }
+    body {
+      font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+      font-size: 15px; line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      max-width: 1440px; margin: 0 auto; padding: var(--pad);
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; width: 100%; height: auto; }
+    ::selection { background: var(--ink); color: var(--paper); }
+    .small { font-size: 12px; letter-spacing: .015em; }
+    .caps { text-transform: uppercase; letter-spacing: .09em; }
+    .grey { color: var(--grey); }
+    .grid { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--gap); }
+    .line { border-bottom: 1px solid var(--hair); transition: border-color .2s; }
+    .line:hover { border-color: var(--ink); }
+
+    /* top */
+    header { display: flex; justify-content: space-between; align-items: baseline; gap: 2rem; padding-bottom: .9rem; border-bottom: 1px solid var(--hair); }
+    header h1 { font-stretch: 62%; font-weight: 800; font-size: 2.1rem; line-height: 1; letter-spacing: .005em; }
+    header nav { display: flex; gap: 1.6rem; }
+    header nav a { border-bottom: 1px solid transparent; transition: border-color .2s; }
+    header nav a:hover { border-color: var(--ink); }
+
+    /* about */
+    .about { margin-top: 1.4rem; align-items: start; }
+    .about figure { grid-column: 1 / 3; }
+    .about figure img { aspect-ratio: 3 / 4; object-fit: cover; filter: grayscale(1); }
+    .about .bio { grid-column: 3 / 13; font-size: 14.5px; line-height: 1.55; columns: 2; column-gap: var(--gap); }
+    .about .bio p { break-inside: avoid; margin-bottom: .8em; }
+    .about .bio p:last-child { margin-bottom: 0; }
+
+    /* projects: every project gets the same frame */
+    .section-label { margin-top: clamp(3rem, 6vw, 4.5rem); padding-bottom: .9rem; color: var(--grey); }
+    .tabrow { display: none; }
+    .project { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--gap); align-items: start; align-content: start;
+               padding: 2rem 0 2.6rem; border-top: 1px solid var(--hair); }
+    .project .info { grid-column: 1 / 6; }
+    .project .media { grid-column: 7 / 13; }
+    .project .kicker { margin-bottom: .7rem; }
+    .project h2 { font-stretch: 62%; font-weight: 700; font-size: clamp(2.1rem, 3.4vw, 3.1rem); line-height: .95; letter-spacing: -.012em; }
+    .project .sub { margin-top: .55rem; color: var(--grey); font-size: 14px; }
+    .project .lead { margin-top: 1.4rem; font-size: clamp(1.02rem, 1.2vw, 1.14rem); line-height: 1.42; letter-spacing: -.003em; }
+    .project .info p:not(.sub):not(.lead) { margin-top: .85em; }
+    .links { margin-top: 1.2rem; display: flex; gap: 1.4rem; flex-wrap: wrap; }
+    .frame { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .frame.two { grid-template-columns: 1fr 1fr; }
+    .frame { aspect-ratio: 2 / 1; }
+    .frame img { width: 100%; height: 100%; min-height: 0; display: block; }
+    .facts { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--gap); margin-top: 1.6rem; border-top: 1px solid var(--ink); }
+    .fact { padding: .7rem 0 .8rem; border-bottom: 1px solid var(--hair); }
+    .fact dt { font-size: 10.5px; letter-spacing: .1em; color: var(--grey); margin-bottom: .3rem; }
+    .fact dd { font-size: 14px; line-height: 1.35; }
+    .fact:last-child:nth-child(odd) { grid-column: 1 / -1; }
+
+    /* one project at a time once the script runs */
+    .js .tabrow { display: flex; gap: 2.4rem; align-items: stretch; border-bottom: 1px solid var(--hair); border-top: 1px solid var(--hair); }
+    .tabs { display: flex; align-items: stretch; position: relative; flex: 1; justify-content: space-between; gap: 1.6rem; }
+    .tabs button, .step button { background: none; border: 0; font: inherit; letter-spacing: inherit; text-transform: inherit; color: var(--grey); cursor: pointer; padding: .8rem 0; transition: color .25s; white-space: nowrap; }
+    .tabs button:hover, .tabs button[aria-selected="true"], .step button:hover { color: var(--ink); }
+    .step { display: flex; gap: 1.2rem; }
+    .step button:disabled { opacity: .3; cursor: default; }
+    .tabs .bar { position: absolute; left: 0; bottom: -1px; height: 2px; background: var(--ink); transition: transform .45s cubic-bezier(.3,.7,.2,1), width .45s cubic-bezier(.3,.7,.2,1); }
+    .js .stage { display: grid; overflow-x: clip; touch-action: pan-y; border-bottom: 1px solid var(--hair); }
+    .js .project { grid-area: 1 / 1; border-top: 0; opacity: 0; visibility: hidden; transform: translateX(14px);
+                   transition: opacity .35s ease, transform .5s cubic-bezier(.3,.7,.2,1), visibility 0s .5s; }
+    .js .project.left { transform: translateX(-14px); }
+    .js .project.on { opacity: 1; visibility: visible; transform: none; transition: opacity .45s ease .08s, transform .55s cubic-bezier(.3,.7,.2,1); }
+    @media (prefers-reduced-motion: reduce) { .js .project, .js .project.on, .tabs .bar { transition: none; } }
+
+    @media (max-width: 1000px) {
+      .js .tabs { overflow-x: auto; scrollbar-width: none; justify-content: flex-start; }
+      .js .tabs::-webkit-scrollbar { display: none; }
+      .project .info { grid-column: 1 / 7; }
+      .project .media { grid-column: 7 / 13; }
+    }
+    @media (max-width: 680px) {
+      .project { display: flex; flex-direction: column; }
+      .project .info { display: contents; }
+      .project .kicker, .project h2, .project .sub { order: 0; }
+      .project .media { display: contents; }
+      .project figure { order: 1; margin-top: 1.4rem; }
+      .project .lead, .project .info p:not(.sub), .project .links { order: 2; }
+      .project .facts { order: 3; margin-top: 1.6rem; }
+      .project .lead { margin-top: 1.2rem; }
+    }
+
+    @media (max-width: 1000px) {
+      .about figure { grid-column: 1 / 4; }
+      .about .bio { grid-column: 4 / 13; columns: 1; }
+    }
+    @media (max-width: 680px) {
+      header { flex-direction: column-reverse; align-items: stretch; gap: 1.4rem; border-bottom: 0; padding-bottom: 0; }
+      header h1 { font-size: 2.3rem; }
+      header nav { justify-content: flex-end; gap: 1.2rem; }
+      .about figure { grid-column: 1 / 7; }
+      .about .bio { grid-column: 1 / 13; margin-top: 1.3rem; font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Johan Malmstedt</h1>
+    <nav class="small caps">
+      <a href="cv.pdf">CV</a>
+      <a href="mailto:johan.malmstedt@lir.gu.se">Email</a>
+      <a href="https://orcid.org/0000-0001-5207-4296">ORCID</a>
+    </nav>
+  </header>
+
+  <section class="about grid">
+    <figure><img src="photo.jpg" alt="Johan Malmstedt"></figure>
+    <div class="bio">
+      <p>Johan Malmstedt is a researcher in media and communication studies and digital humanities, specialising in audiovisual source analysis and signal processing methods for humanities research. He is a postdoctoral researcher at the Gothenburg Research Infrastructure for Digital Humanities (GRIDH), University of Gothenburg, and metaLAB (at) Harvard. During autumn 2026 he is affiliated with the Sound Studies Lab at the University of Copenhagen.</p>
+      <p>With a background in the history of ideas and computational methods, he approaches audiovisual media as an object of knowledge, at the conjunction between signal processing and historiography. His interests span sound studies, cultural history, the philosophy of technology, computational analysis, and arts and design, with a focus on large-scale audiovisual archives.</p>
+      <p>His doctoral dissertation, Sound out of Time: Signal Archaeology of Swedish Public Service Radio, 1980–1999 (Umeå University, 2025), used computational methods to listen to more than 15,000 hours of Swedish public service radio. Introducing an approach he calls signal archaeology, which merges media archaeology with cultural analytics, it traces how the sound of radio changed as Sweden moved from a broadcasting monopoly to a competitive market.</p>
+      <p>He is acting programme coordinator of the Master’s Programme in Critical Studies at the University of Gothenburg. He teaches History of Technology at Chalmers University of Technology, supervises theses in digital humanities and the history of ideas, and has given guest lectures and open seminars at universities such as the University of Groningen, Harvard University, New York University and Humboldt-Universität zu Berlin.</p>
+    </div>
+  </section>
+
+  <div class="section-label small caps">Ongoing</div>
+
+  <section class="projects" aria-label="Ongoing projects">
+    <div class="tabrow small caps">
+      <div class="tabs" role="tablist"><span class="bar"></span></div>
+      <div class="step"><button class="prev" aria-label="Previous project">←</button><button class="next" aria-label="Next project">→</button></div>
+    </div>
+    <div class="stage">
+      <article class="project">
+        <div class="info">
+          <h2>Audiovisual Aesthetics in Formation</h2>
+          <p class="sub">Comparative and Computational Analysis of Transatlantic Television Style, 1970–1989</p>
+          <p class="lead">How did the aesthetics of television come to define the way we perceive audiovisual media today? The project examines the history of crossmodal alignment, the interplay between sound and image, across Swedish and American television between 1970 and 1989.</p>
+          <p>It explores how sound and image together shaped stylistic conventions in genres such as documentary, children’s programming and drama. Combining variational autoencoders and signal analysis with historical interpretation, it traces how cultural, institutional and technological factors influenced the form of television in two contrasting broadcasting environments.</p><p>The project is carried out in collaboration with the American Archive of Public Broadcasting and the Swedish National Archives.</p>
+          <div class="links small"><a class="line" href="https://metalab.harvard.edu/p/audiovisual-aesthetics-in-formation/">Project page →</a></div>
+        </div>
+        <div class="media">
+          <figure>
+            <div class="frame two"><img src="img/audiovisual-aesthetics.jpg" alt="Loudness curve and frame strip of a single broadcast." style="object-fit:cover;object-position:50% 50%;background:#f2f2f0"><img src="img/audiovisual-aesthetics-2.jpg" alt="The Ocular Harpsichord, a playable latent terrain." style="object-fit:cover;object-position:50% 50%;background:#f2f2f0" loading="lazy"></div>
+          </figure>
+          <dl class="facts"><div class="fact"><dt class="caps">Role</dt><dd>Postdoctoral fellow and project leader</dd></div><div class="fact"><dt class="caps">Period</dt><dd>2025–2028</dd></div><div class="fact"><dt class="caps">Institutions</dt><dd>metaLAB (at) Harvard, GRIDH University of Gothenburg, American Archive of Public Broadcasting, Swedish National Archives</dd></div><div class="fact"><dt class="caps">Funding</dt><dd>Swedish Research Council</dd></div></dl>
+        </div>
+      </article>
+      <article class="project">
+        <div class="info">
+          <h2>Lägg ut! Lägg ut!</h2>
+          <p class="sub">Terrorismens audiovisuella mediering i svensk television 1968–1987</p>
+          <p class="lead">An iconic moment in Swedish television history is the 1975 broadcast from the West German embassy siege in Stockholm. As a bomb explosion rocked the embassy, news reporter Bo Holmström exclaimed “Go live! Go live!” (“Lägg ut! Lägg ut!”).</p>
+          <p>The project analyses how terrorism was mediated as a national concern in Swedish public service television, from the first broadcasts of Palestinian plane hijackings in 1968 to the end of the television monopoly in 1987. It asks how Swedish television represented, imagined and aesthetically encoded terrorism as an emergent issue in relation to Swedish society.</p><p>The work is organised in three branches, Framing, Aestheticising and Minding Terrorism. It combines close readings of key programmes with distant viewing of the digitised television archive at the National Library of Sweden, using speech recognition, image analysis and audio signal processing.</p>
+          
+        </div>
+        <div class="media">
+          <figure>
+            <div class="frame"><img src="img/lagg-ut.jpg" alt="Visual and audio analysis of archival news footage: objects detected in the image and in the sound." style="object-fit:contain;object-position:50% 50%;background:#000" loading="lazy"></div>
+          </figure>
+          <dl class="facts"><div class="fact"><dt class="caps">Role</dt><dd>Co-founder and researcher</dd></div><div class="fact"><dt class="caps">Period</dt><dd>2026–2029</dd></div><div class="fact"><dt class="caps">Team</dt><dd>Daniel Brodén (PI), Mats Fridlund, Johan Malmstedt</dd></div><div class="fact"><dt class="caps">Institutions</dt><dd>GRIDH University of Gothenburg, National Library of Sweden</dd></div><div class="fact"><dt class="caps">Funding</dt><dd>Swedish Research Council</dd></div></dl>
+        </div>
+      </article>
+      <article class="project">
+        <div class="info">
+          <h2>Arboretum Stories</h2>
+          <p class="sub">Mapping Knowledge Ecology in the Arnold Arboretum</p>
+          <p class="lead">The Arnold Arboretum of Harvard University, a 281 acre living museum founded in 1872 in Boston, is understood here as a hybrid site where scientific inquiry, environmental stewardship and interspecies encounters meet.</p>
+          <p>Working from digitised accession ledgers, planting maps and curator notes, the project combines more than a century of curatorial records with computational methods, geospatial mapping and information design. It traces the intertwined histories of plants and the people who cared for them, treating the arboretum as both a living collection and a historical record.</p><p>The result, Living Library of Trees, is an interactive map with different entry points for staff, researchers and the public.</p>
+          <div class="links small"><a class="line" href="https://metalab.harvard.edu/p/arnold-arboretum">Project page →</a><a class="line" href="https://doi.org/10.48550/arXiv.2509.00114">Paper →</a></div>
+        </div>
+        <div class="media">
+          <figure>
+            <div class="frame two"><img src="img/arboretum-stories.jpg" alt="Accessioned plants on a historical map of the Arboretum, above a timeline of accessions." style="object-fit:cover;object-position:50% 50%;background:#f2f2f0" loading="lazy"><img src="img/arboretum-stories-2.jpg" alt="Living Library of Trees: curators and their recorded work across the landscape." style="object-fit:cover;object-position:50% 50%;background:#f2f2f0" loading="lazy"></div>
+          </figure>
+          <dl class="facts"><div class="fact"><dt class="caps">Role</dt><dd>Founding member</dd></div><div class="fact"><dt class="caps">Period</dt><dd>Since 2024</dd></div><div class="fact"><dt class="caps">Team</dt><dd>Johan Malmstedt, Dario Rodighiero, Giacomo Nanni</dd></div><div class="fact"><dt class="caps">Institutions</dt><dd>metaLAB (at) Harvard</dd></div><div class="fact"><dt class="caps">Funding</dt><dd>Leventhal Map &amp; Education Center, Boston Public Library</dd></div></dl>
+        </div>
+      </article>
+      <article class="project">
+        <div class="info">
+          <h2>Signal archaeology</h2>
+          <p class="sub">Media history read from the recorded signal</p>
+          <p class="lead">Signal archaeology is the approach developed in the dissertation Sound out of Time. It reads media history from the recorded signal itself, through silence, loudness, spectra and rhythm, in the Swedish broadcast archives.</p>
+          <p>The approach has been used to study the stylistic development of Swedish public service radio between 1980 and 1999, and, in The Noise of the News, to trace the sonic profile of early Swedish television news through spectral visualisation of broadcasts from 1958 to 1978.</p><p>The work continues in current research on television sound and in teaching, including the open teaching resource Soundscape Data, a critical introduction to the analysis and curation of field recordings.</p>
+          <div class="links small"><a class="line" href="https://urn.kb.se/resolve?urn=urn:nbn:se:umu:diva-236882">Dissertation →</a></div>
+        </div>
+        <div class="media">
+          <figure>
+            <div class="frame two"><img src="img/signal-archaeology.jpg" alt="A spectrogram printed as a physical object." style="object-fit:cover;object-position:50% 50%;background:#f2f2f0" loading="lazy"><img src="img/signal-archaeology-2.jpg" alt="Audio Mapper: segments of sound mapped by their acoustic features." style="object-fit:cover;object-position:50% 50%;background:#f2f2f0" loading="lazy"></div>
+          </figure>
+          <dl class="facts"><div class="fact"><dt class="caps">Role</dt><dd>Researcher and teacher</dd></div><div class="fact"><dt class="caps">Period</dt><dd>Since 2020</dd></div><div class="fact"><dt class="caps">Institutions</dt><dd>Umeå University, University of Gothenburg</dd></div></dl>
+        </div>
+      </article>
+      <article class="project">
+        <div class="info">
+          <h2>Formatfrågor</h2>
+          <p class="sub">Format Inquiries</p>
+          <p class="lead">Format Inquiries is a research group on methodological approaches to format studies, led together with Zakayo Kjellström.</p>
+          <p>Its work is collected in the anthology Formatfrågor, published by Mediehistoriskt arkiv and Kriterium in autumn 2026. The anthology invites scholars to explore the role of format within their specific fields. Throughout the project, the group has engaged in workshops and public lectures highlighting the potential of format perspectives in different academic contexts. During the publishing process, the project has experimented with different printing formats.</p>
+          
+        </div>
+        <div class="media">
+          <figure>
+            <div class="frame"><img src="img/formatfragor.jpg" alt="A book block in the press." style="object-fit:cover;object-position:50% 50%;background:#f2f2f0" loading="lazy"></div>
+          </figure>
+          <dl class="facts"><div class="fact"><dt class="caps">Role</dt><dd>Project leader and editor</dd></div><div class="fact"><dt class="caps">Period</dt><dd>2023–2026</dd></div><div class="fact"><dt class="caps">Team</dt><dd>Zakayo Kjellström, Johan Malmstedt</dd></div><div class="fact"><dt class="caps">Institutions</dt><dd>Stockholm, Lund, Uppsala, Gothenburg and Umeå universities</dd></div><div class="fact"><dt class="caps">Funding</dt><dd>SLUGU collaboration grant</dd></div></dl>
+        </div>
+      </article>
+      <article class="project">
+        <div class="info">
+          <h2>Soundscapes of Warning</h2>
+          <p class="sub">The Past, Present, and Futures of Viktigt Meddelande till Allmänheten (VMA)</p>
+          <p class="lead">How are sounds of warning embedded in social life and in Swedish society? VMA was first launched in 1931 and has since shaped the soundtrack of urban modernity, through radio and television broadcasts and the outdoor sirens popularly known as Hesa Fredrik.</p>
+          <p>The project traces the intellectual, political, material and cultural development of the Swedish public warning system, with explicit comparisons to surrounding countries and to Denmark in particular.</p><p>Together with C2DH at the University of Luxembourg, the project has developed an experimental application for exploring how sirens and civil alert signals vary across national and historical contexts.</p>
+          <div class="links small"><a class="line" href="https://liu.se/en/research/soundscapes-of-warning">Project page →</a></div>
+        </div>
+        <div class="media">
+          <figure>
+            <div class="frame two"><img src="img/soundscapes-of-warning.jpg" alt="The Soundscapes of Warning application, developed with C2DH." style="object-fit:cover;object-position:50% 50%;background:#f2f2f0" loading="lazy"><img src="img/soundscapes-of-warning-2.jpg" alt="Spectrogram of the Danish warning signal." style="object-fit:cover;object-position:50% 50%;background:#f2f2f0" loading="lazy"></div>
+          </figure>
+          <dl class="facts"><div class="fact"><dt class="caps">Role</dt><dd>Research designer</dd></div><div class="fact"><dt class="caps">Period</dt><dd>2024–2026</dd></div><div class="fact"><dt class="caps">Team</dt><dd>Marie Cronqvist (PI), Kirill Mitsurov, Danièle Guido, Johan Malmstedt</dd></div><div class="fact"><dt class="caps">Institutions</dt><dd>Linköping University, Lund University, C2DH University of Luxembourg</dd></div><div class="fact"><dt class="caps">Funding</dt><dd>Swedish Research Council</dd></div></dl>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <div style="height: clamp(3rem, 7vw, 5rem)"></div>
+
+<script>
+(function () {
+  document.documentElement.classList.add('js');
+  const root = document.querySelector('.projects');
+  const tabs = root.querySelector('.tabs'), bar = tabs.querySelector('.bar');
+  const stage = root.querySelector('.stage');
+  const projects = [...root.querySelectorAll('.project')];
+  const prev = root.querySelector('.prev'), next = root.querySelector('.next');
+  let cur = 0;
+
+  projects.forEach((p, i) => {
+    p.id = 'p' + i; p.setAttribute('role', 'tabpanel');
+    const b = document.createElement('button');
+    b.textContent = p.querySelector('h2').textContent;
+    b.setAttribute('role', 'tab'); b.setAttribute('aria-controls', p.id);
+    b.addEventListener('click', () => show(i));
+    tabs.appendChild(b);
+
+  });
+  const buttons = [...tabs.querySelectorAll('button')];
+
+  function place() {
+    const b = buttons[cur];
+    bar.style.width = b.offsetWidth + 'px';
+    bar.style.transform = `translateX(${b.offsetLeft}px)`;
+  }
+  function show(i, first) {
+    i = Math.max(0, Math.min(projects.length - 1, i));
+    projects.forEach((p, n) => { p.classList.toggle('on', n === i); p.classList.toggle('left', n < i); p.inert = n !== i; });
+    buttons.forEach((b, n) => { b.setAttribute('aria-selected', n === i); b.tabIndex = n === i ? 0 : -1; });
+    cur = i; place();
+    prev.disabled = i === 0; next.disabled = i === projects.length - 1;
+    if (tabs.scrollWidth > tabs.clientWidth) tabs.scrollTo({ left: buttons[i].offsetLeft - 20, behavior: first ? 'auto' : 'smooth' });
+    if (!first) {
+      const top = root.getBoundingClientRect().top;
+      if (top < 0) scrollBy({ top: top - 12, behavior: 'smooth' });
+    }
+  }
+  prev.addEventListener('click', () => show(cur - 1));
+  next.addEventListener('click', () => show(cur + 1));
+  tabs.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { show(cur + 1); buttons[cur].focus(); }
+    if (e.key === 'ArrowLeft') { show(cur - 1); buttons[cur].focus(); }
+  });
+
+  // sideways scroll or swipe moves between projects; up and down scrolls the page as usual
+  let acc = 0, lock = 0;
+  stage.addEventListener('wheel', e => {
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    const now = performance.now(); if (now < lock) return;
+    acc += e.deltaX;
+    if (Math.abs(acc) > 60) { show(cur + Math.sign(acc)); acc = 0; lock = now + 600; }
+  }, { passive: false });
+  let x0 = null, y0 = 0;
+  stage.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') { x0 = e.clientX; y0 = e.clientY; } });
+  stage.addEventListener('pointerup', e => {
+    if (x0 === null) return;
+    const dx = e.clientX - x0, dy = e.clientY - y0; x0 = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) show(cur - Math.sign(dx));
+  });
+  addEventListener('resize', place);
+  document.fonts && document.fonts.ready.then(place);
+  show(0, true);
+})();
+</script>
+</body>
+</html>
