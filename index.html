@@ -38,7 +38,7 @@
     /* about */
     .about { margin-top: 1.4rem; align-items: start; }
     .about figure { grid-column: 1 / 3; }
-    .about figure img { aspect-ratio: 3 / 4; object-fit: cover; filter: grayscale(1); }
+    .about figure img { aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 0%; filter: grayscale(1); }
     .about .bio { grid-column: 3 / 13; font-size: 14.5px; line-height: 1.55; columns: 2; column-gap: var(--gap); }
     .about .bio p { break-inside: avoid; margin-bottom: .8em; }
     .about .bio p:last-child { margin-bottom: 0; }
@@ -59,36 +59,43 @@
     .frame { display: grid; grid-template-columns: 1fr; gap: 10px; }
     .frame.two { grid-template-columns: 1fr 1fr; }
     .frame { aspect-ratio: 2 / 1; }
-    .frame img { width: 100%; height: 100%; min-height: 0; display: block; }
+    .frame img { width: 100%; height: 100%; min-height: 0; display: block; filter: grayscale(1); transition: filter .5s ease; }
+    .frame img:hover, .frame img.lit { filter: none; }
     .facts { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--gap); margin-top: 1.6rem; border-top: 1px solid var(--ink); }
     .fact { padding: .7rem 0 .8rem; border-bottom: 1px solid var(--hair); }
     .fact dt { font-size: 10.5px; letter-spacing: .1em; color: var(--grey); margin-bottom: .3rem; }
     .fact dd { font-size: 14px; line-height: 1.35; }
     .fact:last-child:nth-child(odd) { grid-column: 1 / -1; }
 
+    /* black band that closes the page */
+    .closing { height: 18px; margin: clamp(3rem, 7vw, 5rem) 0 calc(-1 * var(--pad)); background: var(--ink); box-shadow: 0 0 0 100vmax var(--ink); clip-path: inset(0 -100vmax); }
+
     /* one project at a time once the script runs */
-    .js .tabrow { display: flex; gap: 2.4rem; align-items: stretch; border-bottom: 1px solid var(--hair); border-top: 1px solid var(--hair); }
-    .tabs { display: flex; align-items: stretch; position: relative; flex: 1; justify-content: space-between; gap: 1.6rem; }
-    .tabs button, .step button { background: none; border: 0; font: inherit; letter-spacing: inherit; text-transform: inherit; color: var(--grey); cursor: pointer; padding: .8rem 0; transition: color .25s; white-space: nowrap; }
-    .tabs button:hover, .tabs button[aria-selected="true"], .step button:hover { color: var(--ink); }
+    .tabbed .tabrow { display: flex; gap: 2.4rem; align-items: stretch; background: var(--ink); box-shadow: 0 0 0 100vmax var(--ink); clip-path: inset(0 -100vmax); }
+    .tabs { display: flex; align-items: stretch; position: relative; flex: 1; justify-content: space-between; gap: .4rem; margin-left: -.9rem; }
+    .tabs button, .step button { background: none; border: 0; font: inherit; letter-spacing: inherit; text-transform: inherit; color: #8a8a85; cursor: pointer; padding: .95rem 0; transition: color .25s, background-color .25s; white-space: nowrap; }
+    .tabs button { padding: .95rem .9rem; }
+    .tabs button:hover, .step button:hover { color: var(--paper); }
+    .tabs button[aria-selected="true"] { background: var(--paper); color: var(--ink); }
     .step { display: flex; gap: 1.2rem; }
     .step button:disabled { opacity: .3; cursor: default; }
-    .tabs .bar { position: absolute; left: 0; bottom: -1px; height: 2px; background: var(--ink); transition: transform .45s cubic-bezier(.3,.7,.2,1), width .45s cubic-bezier(.3,.7,.2,1); }
-    .js .stage { display: grid; overflow-x: clip; touch-action: pan-y; border-bottom: 1px solid var(--hair); }
-    .js .project { grid-area: 1 / 1; border-top: 0; opacity: 0; visibility: hidden; transform: translateX(14px);
+    .tabs .bar { display: none; position: absolute; left: 0; bottom: 0; height: 2px; background: var(--paper); transition: transform .45s cubic-bezier(.3,.7,.2,1), width .45s cubic-bezier(.3,.7,.2,1); }
+    .tabbed .stage { display: grid; overflow-x: clip; touch-action: pan-y; }
+    .tabbed .project { grid-area: 1 / 1; border-top: 0; opacity: 0; visibility: hidden; transform: translateX(14px);
                    transition: opacity .35s ease, transform .5s cubic-bezier(.3,.7,.2,1), visibility 0s .5s; }
-    .js .project.left { transform: translateX(-14px); }
-    .js .project.on { opacity: 1; visibility: visible; transform: none; transition: opacity .45s ease .08s, transform .55s cubic-bezier(.3,.7,.2,1); }
-    @media (prefers-reduced-motion: reduce) { .js .project, .js .project.on, .tabs .bar { transition: none; } }
+    .tabbed .project.left { transform: translateX(-14px); }
+    .tabbed .project.on { opacity: 1; visibility: visible; transform: none; transition: opacity .45s ease .08s, transform .55s cubic-bezier(.3,.7,.2,1); }
+    @media (prefers-reduced-motion: reduce) { .tabbed .project, .tabbed .project.on, .tabs .bar { transition: none; } }
 
     @media (max-width: 1000px) {
-      .js .tabs { overflow-x: auto; scrollbar-width: none; justify-content: flex-start; }
-      .js .tabs::-webkit-scrollbar { display: none; }
+      .tabbed .tabs { overflow-x: auto; scrollbar-width: none; justify-content: flex-start; }
+      .tabbed .tabs::-webkit-scrollbar { display: none; }
       .project .info { grid-column: 1 / 7; }
       .project .media { grid-column: 7 / 13; }
     }
     @media (max-width: 680px) {
-      .project { display: flex; flex-direction: column; }
+      .project { display: flex; flex-direction: column; padding: 2.2rem 0 2.6rem; }
+      .project:first-child { border-top: 1px solid var(--ink); }
       .project .info { display: contents; }
       .project .kicker, .project h2, .project .sub { order: 0; }
       .project .media { display: contents; }
@@ -125,10 +132,8 @@
   <section class="about grid">
     <figure><img src="photo.jpg" alt="Johan Malmstedt"></figure>
     <div class="bio">
-      <p>Johan Malmstedt is a researcher in media and communication studies and digital humanities, specialising in audiovisual source analysis and signal processing methods for humanities research. He is a postdoctoral researcher at the Gothenburg Research Infrastructure for Digital Humanities (GRIDH), University of Gothenburg, and affiliated with metaLAB (at) Harvard.</p>
-      <p>With a background in the history of ideas and computational methods, he approaches audiovisual media as an object of knowledge, at the conjunction between signal processing and historiography. His interests span sound studies, cultural history, the philosophy of technology, computational analysis, and arts and design, with a focus on large-scale audiovisual archives.</p>
-      <p>His doctoral dissertation, Sound out of Time: Signal Archaeology of Swedish Public Service Radio, 1980–1999 (Umeå University, 2025), used computational methods to listen to more than 15,000 hours of Swedish public service radio. Introducing an approach he calls signal archaeology, which merges media archaeology with cultural analytics, it traces how the sound of radio changed as Sweden moved from a broadcasting monopoly to a competitive market.</p>
-      <p>He is acting programme coordinator of the Master’s Programme in Critical Studies at the University of Gothenburg. He teaches History of Technology at Chalmers University of Technology, supervises theses in digital humanities and the history of ideas, and has given guest lectures and open seminars at universities such as the University of Groningen, Harvard University, New York University and Humboldt-Universität zu Berlin.</p>
+      <p>Johan Malmstedt is a researcher working at the intersection of cultural history, sound studies and media arts, specialising in audiovisual source analysis and signal processing methods for humanities research. He is a postdoctoral researcher at the Gothenburg Research Infrastructure for Digital Humanities (GRIDH), University of Gothenburg, and affiliated with metaLAB (at) Harvard, with an International Postdoctoral Fellowship from the Swedish Research Council (2025–2028).</p>
+      <p>His doctoral dissertation, Sound out of Time (Umeå University, 2025), listens to more than 15,000 hours of Swedish public service radio. With a background in the history of ideas and computational methods, he is interested in the conjunction between signal processing and historiography. He has given guest lectures and open seminars at universities such as the University of Groningen, Harvard University, New York University and Humboldt-Universität zu Berlin.</p>
     </div>
   </section>
 
@@ -233,11 +238,10 @@
     </div>
   </section>
 
-  <div style="height: clamp(3rem, 7vw, 5rem)"></div>
+  <div class="closing" aria-hidden="true"></div>
 
 <script>
 (function () {
-  document.documentElement.classList.add('js');
   const root = document.querySelector('.projects');
   const tabs = root.querySelector('.tabs'), bar = tabs.querySelector('.bar');
   const stage = root.querySelector('.stage');
@@ -262,6 +266,7 @@
     bar.style.transform = `translateX(${b.offsetLeft}px)`;
   }
   function show(i, first) {
+    if (!root.classList.contains('tabbed')) return;
     i = Math.max(0, Math.min(projects.length - 1, i));
     projects.forEach((p, n) => { p.classList.toggle('on', n === i); p.classList.toggle('left', n < i); p.inert = n !== i; });
     buttons.forEach((b, n) => { b.setAttribute('aria-selected', n === i); b.tabIndex = n === i ? 0 : -1; });
@@ -298,7 +303,20 @@
   });
   addEventListener('resize', place);
   document.fonts && document.fonts.ready.then(place);
-  show(0, true);
+  // touch screens have no hover: an image turns to colour while it passes the middle of the screen
+  if (matchMedia('(hover: none)').matches && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => es.forEach(en => en.target.classList.toggle('lit', en.isIntersecting)), { rootMargin: '-35% 0px -35% 0px' });
+    root.querySelectorAll('.frame img').forEach(im => io.observe(im));
+  }
+
+  // on phones the projects simply follow one another; tabs only from tablet width up
+  const wide = matchMedia('(min-width: 681px)');
+  function mode() {
+    if (wide.matches) { root.classList.add('tabbed'); show(cur, true); }
+    else { root.classList.remove('tabbed'); projects.forEach(p => { p.inert = false; p.classList.remove('on', 'left'); }); }
+  }
+  wide.addEventListener('change', mode);
+  mode();
 })();
 </script>
 </body>
